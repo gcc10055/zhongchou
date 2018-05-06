@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jsplay.hello.member.dao.MemberDao">
+
+    <select id="queryByLoginacct" resultType="com.jsplay.hello.utils.bean.Member">
+        select * from t_member where loginacct = #{loginacct}
+    </select>
+
+    <select id="queryMemberCertFileByMemberid" resultType="com.jsplay.hello.utils.bean.MemberCertFile">
+        select
+            a.*,
+            b.name as certname
+        from t_member_cert a
+        join t_cert b on a.certid = b.id
+        where a.memberid = #{memberid}
+    </select>
+
+    <select id="queryMemberByPiid" resultType="com.jsplay.hello.utils.bean.Member">
+        select
+            *
+        from t_member
+        where id = (
+            select
+                memberid
+            from t_ticket
+            where piid = #{piid}
+        )
+    </select>
+
+    <select id="queryCertsByAccttype" resultType="com.jsplay.hello.utils.bean.Cert">
+        select
+            *
+        from t_cert
+        where id in (
+            select
+                certid
+            from t_account_type_cert
+            where accttype = #{accttype}
+        )
+    </select>
+    
+    <insert id="insertMemerCertFile">
+        insert into t_member_cert (
+            memberid, certid, iconpath
+        ) values
+        <foreach collection="mcfs" item="mcf" separator=",">
+        ( #{mcf.memberid}, #{mcf.certid}, #{mcf.iconpath} )
+        </foreach>
+    </insert>
+
+</mapper>
